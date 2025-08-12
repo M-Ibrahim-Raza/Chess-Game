@@ -1,5 +1,12 @@
-from custom_type_hints import PLAYERS_TYPE, POSITION_TYPE,MOVE_LIST_TYPE
-from piece import Piece
+from utils.custom_type_hints import (
+    PLAYERS_TYPE,
+    POSITION_TYPE,
+    MOVE_LIST_TYPE,
+)
+from utils.pieces_type_hints import BOARD_TYPE
+from typing import Callable
+from pieces.piece import Piece
+
 
 class Pawn(Piece):
 
@@ -7,13 +14,21 @@ class Pawn(Piece):
         self.is_first_move: bool = True
         super().__init__(player=player)
 
-    def get_possible_moves_function(self):
+    def get_possible_moves_function(self) -> Callable[
+        [
+            POSITION_TYPE,
+            Callable[[POSITION_TYPE], bool],
+            Callable[[POSITION_TYPE], bool],
+            Callable[[str, POSITION_TYPE], bool],
+        ],
+        MOVE_LIST_TYPE,
+    ]:
 
         def get_possible_moves(
             position: POSITION_TYPE,
-            is_valid_position,
-            is_piece,
-            is_player_piece,
+            is_valid_position: Callable[[POSITION_TYPE], bool],
+            is_piece: Callable[[POSITION_TYPE], bool],
+            is_player_piece: Callable[[POSITION_TYPE], bool],
         ):
             possible_moves_list: MOVE_LIST_TYPE = []
             if self.player == "white":
@@ -65,10 +80,12 @@ class Pawn(Piece):
 
         return get_possible_moves
 
-    def get_move_piece_function(self):
+    def get_move_piece_function(
+        self,
+    ) -> Callable[[BOARD_TYPE, POSITION_TYPE, POSITION_TYPE], None]:
 
         def move_piece(
-            board,
+            board: BOARD_TYPE,
             current_position: POSITION_TYPE,
             move_position: POSITION_TYPE,
         ):

@@ -1,15 +1,16 @@
 import os
-from custom_exceptions import InvalidInput,InvalidMove,InvalidPosition
+from utils.custom_exceptions import InvalidInput, InvalidMove, InvalidPosition
 from typing import Optional
-from custom_type_hints import POSITION_TYPE,MOVE_LIST_TYPE,PLAYERS_TYPE
-from constants import NUM_ROW,NUM_COL,ALPHABET_COL,PLAYERS
-from piece import Piece,PIECE_TYPE
-from pawn import Pawn
-from rook import Rook
-from bishop import Bishop
-from knight import Knight
-from queen import Queen
-from king import King
+from utils.custom_type_hints import POSITION_TYPE, MOVE_LIST_TYPE, PLAYERS_TYPE
+from constants import NUM_ROW, NUM_COL, ALPHABET_COL, PLAYERS
+from pieces.piece import Piece
+from utils.pieces_type_hints import PIECE_TYPE
+from pieces.pawn import Pawn
+from pieces.rook import Rook
+from pieces.bishop import Bishop
+from pieces.knight import Knight
+from pieces.queen import Queen
+from pieces.king import King
 import math
 import time
 
@@ -17,19 +18,34 @@ import time
 class Chess:
 
     CHESS_ALPHABET_MAPPING = {
-    "a": 1,
-    "b": 2,
-    "c": 3,
-    "d": 4,
-    "e": 5,
-    "f": 6,
-    "g": 7,
-    "h": 8, 
+        "a": 1,
+        "b": 2,
+        "c": 3,
+        "d": 4,
+        "e": 5,
+        "f": 6,
+        "g": 7,
+        "h": 8,
     }
 
-    def __init__(self):
-        self.board = self.init_board()
-        self.place_pieces()
+    @staticmethod
+    def is_valid_input(entered_input: str) -> bool:
+        if type(entered_input) is not str:
+            return False
+        if len(entered_input) != 2:
+            return False
+        if type(entered_input[0]) is str and entered_input[0] not in ALPHABET_COL:
+            return False
+        if entered_input[1].isdigit() and int(entered_input[1]) not in NUM_ROW:
+            return False
+        return True
+
+    @staticmethod
+    def is_valid_position(position: POSITION_TYPE):
+        if position[0] in NUM_ROW and position[1] in NUM_COL:
+            return True
+        else:
+            return False
 
     @staticmethod
     def print_heading(heading: str) -> None:
@@ -62,24 +78,35 @@ class Chess:
         return False
 
     @staticmethod
-    def get_position_str(position:POSITION_TYPE):
+    def get_position_str(position: POSITION_TYPE):
         return f"{Chess.get_alphabet(position[1])+str(position[0])}"
 
     @staticmethod
-    def is_valid_input(entered_input: str) -> bool:
-        if type(entered_input) is not str:
-            return False
-        if len(entered_input) != 2:
-            return False
-        if type(entered_input[0]) is str and entered_input[0] not in ALPHABET_COL:
-            return False
-        if entered_input[1].isdigit() and int(entered_input[1]) not in NUM_ROW:
-            return False
-        return True
+    def get_tuple_position(position_str: str) -> POSITION_TYPE:
+        return (int(position_str[1]), Chess.CHESS_ALPHABET_MAPPING[position_str[0]])
 
-    @staticmethod
-    def is_valid_position(position: POSITION_TYPE):
-        if position[0] in NUM_ROW and position[1] in NUM_COL:
+    def __init__(self):
+        self.board = self.init_board()
+        self.place_pieces()
+
+    def is_piece(self, position: POSITION_TYPE) -> bool:
+
+        position_value: Optional[PIECE_TYPE] = self.board[position[0]][position[1]]
+
+        if position_value is None:
+            return False
+        elif isinstance(position_value, Piece):
+            return True
+        else:
+            return False
+
+    def is_player_piece(self, player: PLAYERS_TYPE, position: POSITION_TYPE) -> bool:
+
+        position_value: Optional[PIECE_TYPE] = self.board[position[0]][position[1]]
+
+        if position_value is None:
+            return False
+        elif position_value.player == player:
             return True
         else:
             return False
@@ -103,6 +130,17 @@ class Chess:
                 f"{piece} ({Chess.get_position_str(position)}) Can Move To {possible_moves_str} |"
             )
 
+    def get_possible_moves(self, position: POSITION_TYPE) -> MOVE_LIST_TYPE:
+        piece: PIECE_TYPE = self.board[position[0]][position[1]]
+        get_possible_moves = piece.get_possible_moves_function()
+        possible_moves_list: MOVE_LIST_TYPE = get_possible_moves(
+            position=position,
+            is_valid_position=Chess.is_valid_position,
+            is_piece=self.is_piece,
+            is_player_piece=self.is_player_piece,
+        )
+        return possible_moves_list
+
     def move_piece(
         self,
         current_position: POSITION_TYPE,
@@ -121,49 +159,6 @@ class Chess:
                 current_position[0]
             ][current_position[1]]
             self.board[current_position[0]][current_position[1]] = None
-
-    def is_piece(self, position: POSITION_TYPE) -> bool:
-
-        position_value: Optional[PIECE_TYPE] = self.board[position[0]][position[1]]
-
-        if position_value is None:
-            return False
-        elif isinstance(position_value, Piece):
-            return True
-        else:
-            return False
-
-    def is_player_piece(
-        self, player: PLAYERS_TYPE, position: POSITION_TYPE
-    ) -> bool:
-
-        position_value: Optional[PIECE_TYPE] = self.board[position[0]][position[1]]
-
-        if position_value is None:
-            return False
-        elif position_value.player == player:
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def get_tuple_position(position_str: str) -> POSITION_TYPE:
-        return (int(position_str[1]), Chess.CHESS_ALPHABET_MAPPING[position_str[0]])
-
-    def get_possible_moves(
-        self, position: POSITION_TYPE
-    ) -> MOVE_LIST_TYPE:
-        piece: PIECE_TYPE = self.board[position[0]][position[1]]
-        get_possible_moves = piece.get_possible_moves_function()
-        possible_moves_list: MOVE_LIST_TYPE = (
-            get_possible_moves(
-                position=position,
-                is_valid_position=Chess.is_valid_position,
-                is_piece=self.is_piece,
-                is_player_piece=self.is_player_piece,
-            )
-        )
-        return possible_moves_list
 
     def place_pieces(self):
 
@@ -231,7 +226,7 @@ class Chess:
             print()
             Chess.print_heading(" Press Q to Quit")
             print()
-            game.display_board()
+            self.display_board()
             print(f"\n")
             Chess.print_heading(f" { PLAYERS[is_black_player].upper()} PLAYER TURN")
 
@@ -250,8 +245,8 @@ class Chess:
                         raise InvalidInput()
 
                     # getting position tuple
-                    position: POSITION_TYPE = (
-                        Chess.get_tuple_position(position_str=entered_position)
+                    position: POSITION_TYPE = Chess.get_tuple_position(
+                        position_str=entered_position
                     )
 
                     # Checking if player selects his own piece
@@ -263,8 +258,8 @@ class Chess:
                         )
 
                     # Getting possible moves of that piece
-                    possible_moves_list: MOVE_LIST_TYPE = (
-                        self.get_possible_moves(position=position)
+                    possible_moves_list: MOVE_LIST_TYPE = self.get_possible_moves(
+                        position=position
                     )
 
                     # Printing possible moves
@@ -299,10 +294,8 @@ class Chess:
                                 )
 
                             # getting move position tuple
-                            move_position: POSITION_TYPE = (
-                                Chess.get_tuple_position(
-                                    position_str=entered_move_position
-                                )
+                            move_position: POSITION_TYPE = Chess.get_tuple_position(
+                                position_str=entered_move_position
                             )
 
                             if move_position not in possible_moves_list:
@@ -326,7 +319,6 @@ class Chess:
                     if is_quit:
                         break
 
-                    # input()
                     break
 
                 except InvalidInput as e:
@@ -345,12 +337,6 @@ class Chess:
                 Chess.print_heading("GAME IS FINSIHED")
                 break
 
-            Chess.print_heading(str(position))
+            is_black_player: bool = True if is_black_player == False else False
 
-            is_black_player = True if is_black_player == False else False
-
-            os.system('cls')
-
-
-game = Chess()
-game.start_game()
+            os.system("clear")

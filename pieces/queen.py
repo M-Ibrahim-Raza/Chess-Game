@@ -1,22 +1,32 @@
-from custom_type_hints import PLAYERS_TYPE, POSITION_TYPE,MOVE_LIST_TYPE
-from piece import Piece
+from utils.custom_type_hints import PLAYERS_TYPE, POSITION_TYPE, MOVE_LIST_TYPE
+from typing import Callable
+from pieces.piece import Piece
+
 
 class Queen(Piece):
 
     def __init__(self, player: PLAYERS_TYPE):
         super().__init__(player=player)
 
-    def get_possible_moves_function(self):
+    def get_possible_moves_function(self) -> Callable[
+        [
+            POSITION_TYPE,
+            Callable[[POSITION_TYPE], bool],
+            Callable[[POSITION_TYPE], bool],
+            Callable[[str, POSITION_TYPE], bool],
+        ],
+        MOVE_LIST_TYPE,
+    ]:
 
         def get_possible_moves(
             position: POSITION_TYPE,
-            is_valid_position,
-            is_piece,
-            is_player_piece,
+            is_valid_position: Callable[[POSITION_TYPE], bool],
+            is_piece: Callable[[POSITION_TYPE], bool],
+            is_player_piece: Callable[[POSITION_TYPE], bool],
         ):
-            current_row = position[0]
-            current_col = position[1]
-            enemy_player = "white" if self.player == "black" else "black"
+            current_row: int = position[0]
+            current_col: int = position[1]
+            enemy_player: PLAYERS_TYPE = "white" if self.player == "black" else "black"
             possible_moves_list: MOVE_LIST_TYPE = []
 
             # For rook moves
