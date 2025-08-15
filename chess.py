@@ -111,6 +111,7 @@ class Chess:
         else:
             return False
 
+    
     def print_piece_moves(
         self,
         position: POSITION_TYPE,
@@ -130,15 +131,34 @@ class Chess:
                 f"{piece} ({Chess.get_position_str(position)}) Can Move To {possible_moves_str} |"
             )
 
+    def get_piece_movement_str(
+        self,
+        current_position: POSITION_TYPE,
+        move_position : POSITION_TYPE
+    ):
+        piece = self.board[move_position[0]][move_position[1]]
+        return f"{piece} has Moved from {Chess.get_position_str(current_position)} To {Chess.get_position_str(move_position)}"
+
     def get_possible_moves(self, position: POSITION_TYPE) -> MOVE_LIST_TYPE:
         piece: PIECE_TYPE = self.board[position[0]][position[1]]
         get_possible_moves = piece.get_possible_moves_function()
-        possible_moves_list: MOVE_LIST_TYPE = get_possible_moves(
-            position=position,
-            is_valid_position=Chess.is_valid_position,
-            is_piece=self.is_piece,
-            is_player_piece=self.is_player_piece,
-        )
+        possible_moves_list: MOVE_LIST_TYPE = None
+        if isinstance(piece, Pawn):
+            possible_moves_list = get_possible_moves(
+                position=position,
+                is_valid_position=Chess.is_valid_position,
+                is_piece=self.is_piece,
+                is_player_piece=self.is_player_piece,
+                board=self.board,
+            )
+        else:
+            possible_moves_list = get_possible_moves(
+                position=position,
+                is_valid_position=Chess.is_valid_position,
+                is_piece=self.is_piece,
+                is_player_piece=self.is_player_piece,
+                board=self.board,
+            )
         return possible_moves_list
 
     def move_piece(
@@ -219,6 +239,7 @@ class Chess:
 
         is_black_player = False
         is_quit = False
+        previous_movement_str = ""
 
         while True:
 
@@ -229,8 +250,11 @@ class Chess:
             self.display_board()
             print(f"\n")
             Chess.print_heading(f" { PLAYERS[is_black_player].upper()} PLAYER TURN")
+            print()
+            if previous_movement_str:
+                Chess.print_heading(previous_movement_str)
 
-            time.sleep(0.1)
+            print("", flush=True)
 
             while True:
                 try:
@@ -272,7 +296,7 @@ class Chess:
                     is_change_piece = False
 
                     while True:
-
+                        print()
                         entered_move_position = input("Enter Position to Move : ")
 
                         if entered_move_position.upper() == "C":
@@ -305,12 +329,18 @@ class Chess:
                             self.move_piece(
                                 current_position=position, move_position=move_position
                             )
+
+                            previous_movement_str = self.get_piece_movement_str(current_position=position,move_position=move_position)
+                            print(previous_movement_str)
+
                             break
 
                         except InvalidInput as e:
+                            print()
                             Chess.print_heading(f"{e}")
 
                         except InvalidMove as e:
+                            print()
                             Chess.print_heading(f"{e}")
 
                     if is_change_piece:
@@ -324,11 +354,13 @@ class Chess:
                 except InvalidInput as e:
                     print()
                     Chess.print_heading(f"{e}")
+                    print()
                     continue
 
                 except InvalidPosition as e:
                     print()
                     Chess.print_heading(f"{e}")
+                    print()
                     continue
 
             # Quiting game
