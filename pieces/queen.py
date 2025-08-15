@@ -44,7 +44,6 @@ class Queen(Piece):
             # For backward moves
             for row in range(current_row - 1, 0, -1):
                 move_position = (row, current_col)
-
                 if is_piece(move_position):
                     if is_player_piece(player=enemy_player, position=move_position):
                         possible_moves_list.append(move_position)
