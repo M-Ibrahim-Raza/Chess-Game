@@ -11,8 +11,9 @@ from pieces.bishop import Bishop
 from pieces.knight import Knight
 from pieces.queen import Queen
 from pieces.king import King
+import customtkinter as ctk
+from ui.app import App
 import math
-import time
 
 
 class Chess:
@@ -111,7 +112,6 @@ class Chess:
         else:
             return False
 
-    
     def print_piece_moves(
         self,
         position: POSITION_TYPE,
@@ -132,9 +132,7 @@ class Chess:
             )
 
     def get_piece_movement_str(
-        self,
-        current_position: POSITION_TYPE,
-        move_position : POSITION_TYPE
+        self, current_position: POSITION_TYPE, move_position: POSITION_TYPE
     ):
         piece = self.board[move_position[0]][move_position[1]]
         return f"{piece} has Moved from {Chess.get_position_str(current_position)} To {Chess.get_position_str(move_position)}"
@@ -157,7 +155,6 @@ class Chess:
                 is_valid_position=Chess.is_valid_position,
                 is_piece=self.is_piece,
                 is_player_piece=self.is_player_piece,
-                board=self.board,
             )
         return possible_moves_list
 
@@ -330,7 +327,9 @@ class Chess:
                                 current_position=position, move_position=move_position
                             )
 
-                            previous_movement_str = self.get_piece_movement_str(current_position=position,move_position=move_position)
+                            previous_movement_str = self.get_piece_movement_str(
+                                current_position=position, move_position=move_position
+                            )
                             print(previous_movement_str)
 
                             break
@@ -372,3 +371,153 @@ class Chess:
             is_black_player: bool = True if is_black_player == False else False
 
             os.system("clear")
+
+    def start_ui_game(self):
+
+        ctk.set_appearance_mode("light")
+        ctk.set_default_color_theme("assets/theme.json")
+
+        is_black_player = False
+
+        app = App(
+            self.board,
+            is_black_player,
+            self.get_possible_moves,
+            self.move_piece,
+            self.display_board,
+        )
+        app.mainloop()
+
+        # while True:
+
+        #     Chess.print_heading("| CHESS GAME |")
+        #     print()
+        #     Chess.print_heading(" Press Q to Quit")
+        #     print()
+        #     self.display_board()
+        #     print(f"\n")
+        #     Chess.print_heading(f" { PLAYERS[is_black_player].upper()} PLAYER TURN")
+        #     print()
+        #     if previous_movement_str:
+        #         Chess.print_heading(previous_movement_str)
+
+        #     print("", flush=True)
+
+        #     while True:
+        #         try:
+        #             entered_position = input("Enter Position of Piece to Move : ")
+        #             # Quit on pressing Q | q
+        #             if entered_position.upper() == "Q":
+        #                 is_quit = True
+        #                 break
+
+        #             # Checking input
+        #             if not Chess.is_valid_input(entered_input=entered_position):
+        #                 raise InvalidInput()
+
+        #             # getting position tuple
+        #             position: POSITION_TYPE = Chess.get_tuple_position(
+        #                 position_str=entered_position
+        #             )
+
+        #             # Checking if player selects his own piece
+        #             if not self.is_player_piece(
+        #                 player=PLAYERS[is_black_player], position=position
+        #             ):
+        #                 raise InvalidPosition(
+        #                     f"Please Choose Position of {PLAYERS[is_black_player][0].upper()+PLAYERS[is_black_player][1:]} Piece"
+        #                 )
+
+        #             # Getting possible moves of that piece
+        #             possible_moves_list: MOVE_LIST_TYPE = self.get_possible_moves(
+        #                 position=position
+        #             )
+
+        #             # Printing possible moves
+        #             print()
+        #             Chess.print_heading(f"Press c to Change Piece")
+        #             self.print_piece_moves(
+        #                 position=position, possible_moves_list=possible_moves_list
+        #             )
+
+        #             is_change_piece = False
+
+        #             while True:
+        #                 print()
+        #                 entered_move_position = input("Enter Position to Move : ")
+
+        #                 if entered_move_position.upper() == "C":
+        #                     is_change_piece = True
+        #                     break
+
+        #                 if entered_move_position.upper() == "Q":
+        #                     is_quit = True
+        #                     break
+
+        #                 try:
+
+        #                     # Checking input
+        #                     if not Chess.is_valid_input(
+        #                         entered_input=entered_move_position
+        #                     ):
+        #                         raise InvalidInput(
+        #                             "Invalid Move, Please Enter Valid Move"
+        #                         )
+
+        #                     # getting move position tuple
+        #                     move_position: POSITION_TYPE = Chess.get_tuple_position(
+        #                         position_str=entered_move_position
+        #                     )
+
+        #                     if move_position not in possible_moves_list:
+        #                         raise InvalidMove()
+
+        #                     # Moving piece
+        #                     self.move_piece(
+        #                         current_position=position, move_position=move_position
+        #                     )
+
+        #                     previous_movement_str = self.get_piece_movement_str(
+        #                         current_position=position, move_position=move_position
+        #                     )
+        #                     print(previous_movement_str)
+
+        #                     break
+
+        #                 except InvalidInput as e:
+        #                     print()
+        #                     Chess.print_heading(f"{e}")
+
+        #                 except InvalidMove as e:
+        #                     print()
+        #                     Chess.print_heading(f"{e}")
+
+        #             if is_change_piece:
+        #                 continue
+
+        #             if is_quit:
+        #                 break
+
+        #             break
+
+        #         except InvalidInput as e:
+        #             print()
+        #             Chess.print_heading(f"{e}")
+        #             print()
+        #             continue
+
+        #         except InvalidPosition as e:
+        #             print()
+        #             Chess.print_heading(f"{e}")
+        #             print()
+        #             continue
+
+        #     # Quiting game
+        #     if is_quit:
+        #         print()
+        #         Chess.print_heading("GAME IS FINSIHED")
+        #         break
+
+        #     is_black_player: bool = True if is_black_player == False else False
+
+        #     os.system("clear")

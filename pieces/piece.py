@@ -21,5 +21,9 @@ class Piece(ABC):
         pass
 
     @abstractmethod
+    def get_image_path(self) -> str:
+        pass
+
+    @abstractmethod
     def __str__(self) -> str:
         pass

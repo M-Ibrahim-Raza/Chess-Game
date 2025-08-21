@@ -141,6 +141,9 @@ class Pawn(Piece):
 
         return move_piece
 
+    def get_image_path(self) -> str:
+        return f"{self.player}/pawn.png"
+
     def __str__(self) -> str:
         if self.player == "white":
             return "♟"

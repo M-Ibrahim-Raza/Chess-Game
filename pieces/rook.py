@@ -74,6 +74,9 @@ class Rook(Piece):
 
         return get_possible_moves
 
+    def get_image_path(self) -> str:
+        return f"{self.player}/rook.png"
+
     def __str__(self) -> str:
         if self.player == "white":
             return "♜"
