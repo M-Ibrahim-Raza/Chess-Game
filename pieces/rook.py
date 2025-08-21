@@ -4,8 +4,17 @@ from pieces.piece import Piece
 
 
 class Rook(Piece):
+    """
+    Class representing rook piece
+
+    - Inherits Piece base abstract class
+    """
 
     def __init__(self, player: PLAYERS_TYPE):
+        """
+        Rook class constructor which initialize the Rook object
+        """
+
         super().__init__(player=player)
 
     def get_possible_moves_function(self) -> Callable[
@@ -17,13 +26,41 @@ class Rook(Piece):
         ],
         MOVE_LIST_TYPE,
     ]:
+        """
+        Returns get possible move function
+        """
 
         def get_possible_moves(
             position: POSITION_TYPE,
             is_valid_position: Callable[[POSITION_TYPE], bool],
             is_piece: Callable[[POSITION_TYPE], bool],
             is_player_piece: Callable[[POSITION_TYPE], bool],
-        ):
+        ) -> MOVE_LIST_TYPE:
+            """
+            Returns list of possible moves of rook piece based on its position
+
+
+            Parameters
+            ----------
+            position : POSITION_TYPE
+                Tuple of position ( row_no , column_no )
+
+            is_valid_position : Callable[[POSITION_TYPE], bool]
+                A method that takes position tuple and checks if position is valid or not
+
+            is_piece : Callable[[POSITION_TYPE], bool]
+                A method that takes position tuple and checks if there is any piece at that position
+
+            is_player_piece : Callable[[POSITION_TYPE], bool]
+                A method that takes position tuple and checks if there is any piece of certain player at that position
+
+
+            Return
+            ------
+            possible_moves_list : MOVE_LIST_TYPE
+                List of all possible moves tuples of rook
+            """
+
             current_row: int = position[0]
             current_col: int = position[1]
             enemy_player: PLAYERS_TYPE = "white" if self.player == "black" else "black"
@@ -75,9 +112,17 @@ class Rook(Piece):
         return get_possible_moves
 
     def get_image_path(self) -> str:
+        """
+        Returns path string of rook.png image
+        """
+
         return f"{self.player}/rook.png"
 
     def __str__(self) -> str:
+        """
+        Returns symbol of rook
+        """
+
         if self.player == "white":
             return "♜"
         elif self.player == "black":

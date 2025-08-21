@@ -3,6 +3,10 @@ from PIL import Image
 
 
 class Square(CTkButton):
+    """
+    TKinter button class which represents a square cell in chess board
+    """
+
     def __init__(
         self, master, color, state="enabled", image=None, command=None, **kwargs
     ):

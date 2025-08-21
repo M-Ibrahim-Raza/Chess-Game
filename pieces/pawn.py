@@ -9,19 +9,59 @@ from pieces.piece import Piece
 
 
 class Pawn(Piece):
+    """
+    Class representing pawn piece
+
+    - Inherits Piece base abstract class
+    """
 
     def __init__(self, player: PLAYERS_TYPE):
+        """
+        Pawn class constructor which initialize the Pawn object
+
+
+        Attributes
+        ----------
+        is_first_move : bool
+            checks if first move
+
+        is_en_passant : bool
+            checks if en passant move is valid or not
+        """
+
         self.is_first_move: bool = True
         self.is_en_passant: bool = False
         super().__init__(player=player)
 
-    def direction(self, step):
+    def direction(self, step: int):
+        """
+        Returns vertical step size based on player
+            Positive direction for white ( bottom to top )
+            Negative direction for black ( top to bottom )
+
+
+        Parameters
+        ----------
+        step : int
+            vertical step size
+
+
+        Return
+        ------
+        step : int
+            vertical step size based on player
+        """
+
         if self.player == "white":
             return step
         elif self.player == "black":
             return -step
 
     def opponent_player(self):
+        """
+        Returns team of opponent player
+        """
+
         if self.player == "white":
             return "black"
         elif self.player == "black":
@@ -37,6 +77,9 @@ class Pawn(Piece):
         ],
         MOVE_LIST_TYPE,
     ]:
+        """
+        Returns get possible move function
+        """
 
         def get_possible_moves(
             position: POSITION_TYPE,
@@ -44,7 +87,35 @@ class Pawn(Piece):
             is_piece: Callable[[POSITION_TYPE], bool],
             is_player_piece: Callable[[PLAYERS_TYPE, POSITION_TYPE], bool],
             board: BOARD_TYPE = None,
-        ):
+        ) -> MOVE_LIST_TYPE:
+            """
+            Returns list of possible moves of pawn piece based on its position
+
+
+            Parameters
+            ----------
+            position : POSITION_TYPE
+                Tuple of position ( row_no , column_no )
+
+            is_valid_position : Callable[[POSITION_TYPE], bool]
+                A method that takes position tuple and checks if position is valid or not
+
+            is_piece : Callable[[POSITION_TYPE], bool]
+                A method that takes position tuple and checks if there is any piece at that position
+
+            is_player_piece : Callable[[POSITION_TYPE], bool]
+                A method that takes position tuple and checks if there is any piece of certain player at that position
+
+            board : BOARD_TYPE
+                Board data structure of chess
+
+
+            Return
+            ------
+            possible_moves_list : MOVE_LIST_TYPE
+                List of all possible moves tuples of pawn
+            """
+
             possible_moves_list: MOVE_LIST_TYPE = []
             dir = self.direction
             opp = self.opponent_player
@@ -103,12 +174,35 @@ class Pawn(Piece):
     def get_move_piece_function(
         self,
     ) -> Callable[[BOARD_TYPE, POSITION_TYPE, POSITION_TYPE], None]:
+        """
+        Returns move piece function
+        """
 
         def move_piece(
             board: BOARD_TYPE,
             current_position: POSITION_TYPE,
             move_position: POSITION_TYPE,
         ):
+            """
+            Move pawn from current position to move position
+
+
+            Parameters
+            ----------
+            board : BOARD_TYPE
+                Board data structure of chess
+
+            current_position : POSITION_TYPE
+                Tuple of current position ( row_no , column_no )
+
+            move_position : POSITION_TYPE
+                Tuple of move position ( row_no , column_no )
+
+
+            Return
+            ------
+            None
+            """
 
             # Disallow en passant kill on second move
             if self.is_en_passant == True:
@@ -142,9 +236,17 @@ class Pawn(Piece):
         return move_piece
 
     def get_image_path(self) -> str:
+        """
+        Returns path string of pawn.png image
+        """
+
         return f"{self.player}/pawn.png"
 
     def __str__(self) -> str:
+        """
+        Returns symbol of pawn
+        """
+
         if self.player == "white":
             return "♟"
         elif self.player == "black":

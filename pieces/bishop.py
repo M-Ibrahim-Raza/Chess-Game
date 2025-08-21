@@ -13,11 +13,6 @@ class Bishop(Piece):
     def __init__(self, player: PLAYERS_TYPE):
         """
         Bishop class constructor which initialize the Bishop object
-
-        Attributes
-        ----------
-        player : PLAYERS_TYPE
-            black or white
         """
 
         super().__init__(player=player)
@@ -46,6 +41,7 @@ class Bishop(Piece):
             """
             Returns list of possible moves of bishop piece based on its position
 
+
             Parameters
             ----------
             position : POSITION_TYPE
@@ -56,7 +52,6 @@ class Bishop(Piece):
 
             is_piece : Callable[[POSITION_TYPE], bool]
                 A method that takes position tuple and checks if there is any piece at that position
-
 
             is_player_piece : Callable[[POSITION_TYPE], bool]
                 A method that takes position tuple and checks if there is any piece of certain player at that position
@@ -76,7 +71,7 @@ class Bishop(Piece):
             # For left moves
 
             # For left upward moves
-            row = current_row + 1   
+            row = current_row + 1
             col = current_col - 1
             move_position = (row, col)
             while is_valid_position(move_position):
@@ -139,11 +134,16 @@ class Bishop(Piece):
 
     def get_image_path(self) -> str:
         """
-        Returns path string of bishop.png image 
+        Returns path string of bishop.png image
         """
+
         return f"{self.player}/bishop.png"
 
     def __str__(self) -> str:
+        """
+        Returns symbol of bishop
+        """
+
         if self.player == "white":
             return "♝"
         elif self.player == "black":
